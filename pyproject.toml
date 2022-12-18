@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "poetry add aioredis@2-0-0"
+version = "2.0"
+description = ""
+authors = ["Monty <me@promila.info>"]
+readme = "README.md"
+packages = [{include = "poetry add aioredis@2"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aioredis = "2.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
