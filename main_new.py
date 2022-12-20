@@ -28,6 +28,7 @@ async def get_cache():
 
 
 @app.post('/users/')
+@cache(expire=60, coder=JsonCoder)
 async def create_user(username: str = Query(default=Required),
                       password: str = Query(default=Required, min_length=8, max_length=50),
                       email: str = Query(default=Required)):
@@ -62,26 +63,21 @@ async def update_item(user_id: int,
                       username: str,
                       password: str,
                       email: str):
-    # user = redis.hgetall(f"user:{user_id}")
-    # user["username"]: username
-    # user["password"]: password
-    # user["email"]: email
-    redis.hset("user:{user_id}",
-               {
-                   "username": username,
-                   "password": password,
-                   "email": email
-               }
-
-               )
     user = redis.hgetall(f"user:{user_id}")
+    new_user = {
+        "username": username,
+        "password": password,
+        "email": email
+    }
+    redis.hset(name=f"user:{user_id}", mapping=new_user)
     return user
 
 
 @app.on_event("startup")
 async def startup():
-    redis = aioredis.from_url("redis://127.0.0.1", encoding="utf8", decode_responses=True,password="12345")
+    redis = aioredis.from_url("redis://127.0.0.1", encoding="utf8", decode_responses=True, password="12345")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
 
 # def user_optima(user_id: int):
 #     # First it looks for the data in redis cache
